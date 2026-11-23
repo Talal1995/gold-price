@@ -35,7 +35,8 @@
 
 .current-price,
 .total-value,
-.last-update {
+.last-update,
+.portfolio-breakdown {
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -43,6 +44,7 @@
 
 .current-price .label,
 .total-value .label,
+.portfolio-breakdown .label,
 .last-update {
   font-size: 12px;
   color: #666;
@@ -64,6 +66,34 @@
   margin-left: 4px;
 }
 
+.portfolio-breakdown {
+  gap: 8px;
+}
+
+.breakdown-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: #333;
+}
+
+.breakdown-item span:first-child {
+  font-weight: 500;
+  color: #666;
+}
+
+.breakdown-item span:last-child {
+  font-weight: 600;
+  color: #d4af37;
+}
+
 .last-update {
   font-size: 12px;
   color: #666;
@@ -79,15 +109,21 @@
   border-left: 4px solid #c33;
 }
 
-.holdings-list {
+.holdings-section {
   margin-bottom: 30px;
 }
 
-.holdings-list h3 {
+.holdings-section h3 {
   margin: 0 0 15px 0;
   font-size: 18px;
   color: #333;
   font-weight: 600;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.holdings-list {
+  margin-bottom: 20px;
 }
 
 .holding-card {
@@ -107,6 +143,16 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.holding-card.crypto-card {
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe6e6 100%);
+  border-color: #FFB3B3;
+}
+
+.holding-card.crypto-card:hover {
+  background: linear-gradient(135deg, #fff9f9 0%, #fff0f0 100%);
+  box-shadow: 0 2px 12px rgba(255, 107, 107, 0.15);
+}
+
 .holding-info {
   flex: 1;
   display: flex;
@@ -118,19 +164,31 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
-  min-width: 60px;
+  min-width: 100px;
 }
 
-.holding-spec .weight {
+.holding-spec .weight,
+.holding-spec .crypto-amount {
   font-size: 20px;
   font-weight: 700;
   color: #d4af37;
 }
 
-.holding-spec .purity {
+.holding-card.crypto-card .holding-spec .crypto-amount {
+  color: #FF6B6B;
+}
+
+.holding-spec .purity,
+.holding-spec .crypto-symbol,
+.holding-spec .crypto-label {
   font-size: 12px;
   color: #666;
   font-weight: 600;
+}
+
+.holding-spec .crypto-label {
+  font-size: 11px;
+  color: #999;
 }
 
 .holding-details {
@@ -145,6 +203,31 @@
   color: #666;
 }
 
+.holding-details .crypto-value {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.change-percent {
+  font-weight: 600;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.change-percent.positive {
+  color: #2e7d32;
+  background-color: #e8f5e9;
+}
+
+.change-percent.negative {
+  color: #c62828;
+  background-color: #ffebee;
+}
+
 .holding-chart {
   min-height: 4px;
   background: linear-gradient(90deg, #d4af37, #ffd700);
@@ -153,7 +236,12 @@
   transition: width 0.3s ease;
 }
 
-.portfolio-stats {
+.holding-chart.crypto {
+  background: linear-gradient(90deg, #FF6B6B, #FF9999);
+}
+
+.portfolio-stats,
+.crypto-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 15px;
@@ -170,6 +258,11 @@
   gap: 5px;
 }
 
+.crypto-stats .stat {
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe6e6 100%);
+  border-left-color: #FF6B6B;
+}
+
 .stat-label {
   font-size: 12px;
   color: #666;
@@ -182,6 +275,10 @@
   font-size: 24px;
   font-weight: 700;
   color: #d4af37;
+}
+
+.crypto-stats .stat-value {
+  color: #FF6B6B;
 }
 
 @media (max-width: 768px) {
@@ -204,7 +301,8 @@
     font-size: 20px;
   }
 
-  .portfolio-stats {
+  .portfolio-stats,
+  .crypto-stats {
     grid-template-columns: 1fr;
   }
 }
