@@ -11,3 +11,12 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      # Optional free CoinGecko "Demo" API key (sign up at
+      # https://www.coingecko.com/en/developers/dashboard). Not required for
+      # the app to run, but strongly recommended in production: without it,
+      # CoinGecko's rate limit is tracked per IP, and shared cloud-host IPs
+      # (like Render's free tier) can easily get rate-limited by *other*
+      # tenants' traffic. `sync: false` means Render prompts for the value
+      # in the dashboard instead of storing it in this file.
+      - key: COINGECKO_API_KEY
+        sync: false

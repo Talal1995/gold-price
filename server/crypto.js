@@ -2,14 +2,29 @@ import fetch from 'node-fetch';
 import { withCache } from './cache.js';
 
 const API = 'https://api.coingecko.com/api/v3';
-const REQUEST_HEADERS = {
-  Accept: 'application/json',
-  // A plain/default User-Agent is more likely to get rate-limited or
-  // challenged by CoinGecko when requests come from shared cloud-host IPs
-  // (e.g. Render's free tier) - identify ourselves like a normal client.
-  'User-Agent':
-    'Mozilla/5.0 (compatible; MarketsTrackerApp/1.0; +https://github.com/Talal1995/gold-price)',
-};
+
+// CoinGecko's free "Demo" API key (optional, no cost - sign up at
+// https://www.coingecko.com/en/developers/dashboard) ties the rate limit to
+// the key instead of the caller's IP. Without it, requests still work, but
+// can get rate-limited on shared cloud-host IPs (e.g. Render's free tier)
+// where many unrelated apps' traffic counts against the same anonymous
+// IP-based quota.
+const API_KEY = process.env.COINGECKO_API_KEY;
+
+function buildHeaders() {
+  const headers = {
+    Accept: 'application/json',
+    // A plain/default User-Agent is more likely to get rate-limited or
+    // challenged by CoinGecko when requests come from shared cloud-host IPs.
+    'User-Agent':
+      'Mozilla/5.0 (compatible; MarketsTrackerApp/1.0; +https://github.com/Talal1995/gold-price)',
+  };
+  if (API_KEY) {
+    headers['x-cg-demo-api-key'] = API_KEY;
+  }
+  return headers;
+}
+
 const REQUEST_TIMEOUT_MS = 10_000;
 
 // Coins explicitly requested that aren't necessarily in the top 20 by market
@@ -52,7 +67,7 @@ async function getJson(url) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const response = await fetch(url, { headers: REQUEST_HEADERS, signal: controller.signal });
+    const response = await fetch(url, { headers: buildHeaders(), signal: controller.signal });
     if (!response.ok) {
       const body = await response.text().catch(() => '');
       const err = new Error(`CoinGecko responded with ${response.status}: ${body.slice(0, 200)}`);

@@ -5,17 +5,18 @@ prices and a historical chart with switchable time ranges (1H, 1D, 1W, 1M, 6M, 1
 
 ## Stack
 
-- **`server/`** — Node.js + Express API that proxies free, no-API-key public APIs:
+- **`server/`** — Node.js + Express API that proxies free public APIs:
   - [gold-api.com](https://www.gold-api.com) for live gold (XAU) and silver (XAG) spot prices.
   - [Yahoo Finance chart API](https://query1.finance.yahoo.com) for metals/stocks/index history and
     live stock quotes (no API key, works for any ticker/future symbol: `GC=F`, `SI=F`, `AAPL`, `^IXIC`, …).
-  - [CoinGecko](https://www.coingecko.com) public API for crypto (no API key).
+  - [CoinGecko](https://www.coingecko.com) public API for crypto (keyless by default; an optional
+    free API key is strongly recommended in production — see "Deploying to Render" below).
 - **`client/`** — React 19 app (Vite) with a [Recharts](https://recharts.org) area chart, tabs,
   range selectors, and watchlist tables that poll for live updates.
 
 The backend exists to avoid CORS issues with these endpoints, normalize the response shape across
 three very different upstream APIs, and (for crypto) cache/batch requests to stay within
-CoinGecko's free-tier rate limit. No API keys or secrets are required anywhere.
+CoinGecko's rate limit. No paid API keys or secrets are required anywhere.
 
 ## Tabs
 
@@ -101,12 +102,32 @@ repo root defines this as a Render Blueprint:
    - Health check path: `/api/health`
 3. Deploy. Render sets `PORT` automatically; the server already reads `process.env.PORT`.
 
-No environment variables or API keys are required — every upstream API used (gold-api.com, Yahoo
-Finance, CoinGecko) is public and keyless.
+No required environment variables or API keys — every upstream API used (gold-api.com, Yahoo
+Finance, CoinGecko) is public and keyless. There is one **optional but recommended** one for
+production, covered below.
 
 If you'd rather configure it manually instead of via the Blueprint: create a **Web Service**, set
 Build Command to `npm run build` and Start Command to `npm start`, with the repo root as the root
 directory.
+
+### Optional: CoinGecko API key (fixes crypto rate-limiting in production)
+
+CoinGecko's free public API tracks its rate limit **per IP address**. Render's free tier shares a
+pool of outbound IPs across many unrelated apps, so the Crypto tab can intermittently (or
+persistently) fail with a `429 rate limit` error in production even though this app's own request
+volume is low — the shared IP's quota can already be used up by *other* tenants' traffic.
+
+The fix is a free CoinGecko "Demo" API key, which ties the rate limit to the key instead of the
+IP:
+
+1. Sign up and generate a key at the [CoinGecko Developer Dashboard](https://www.coingecko.com/en/developers/dashboard)
+   (no payment required).
+2. In your Render service's **Environment** tab, add:
+   - Key: `COINGECKO_API_KEY`
+   - Value: *(your key)*
+3. Redeploy. [server/crypto.js](server/crypto.js) automatically sends it as the `x-cg-demo-api-key`
+   header when the env var is set, and falls back to keyless requests (fine for local dev) when
+   it isn't.
 
 ## API endpoints (server)
 
