@@ -62,7 +62,7 @@ export default function Login({ onLogin }) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="talal@gmail.com"
+              placeholder="test@gmail.com"
               required
               disabled={loading}
             />
@@ -99,7 +99,6 @@ export default function Login({ onLogin }) {
           </button>
         </form>
 
-        <p className="login-hint">Demo account: talal@gmail.com / m12341234</p>
       </div>
     </div>
   );
