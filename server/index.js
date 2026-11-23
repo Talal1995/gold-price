@@ -12,6 +12,47 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(cors());
+app.use(express.json());
+
+// Demo user credentials
+const DEMO_USER = {
+  email: 'talal@gmail.com',
+  password: 'm12341234',
+};
+
+// Simple in-memory session store (in production, use a real database)
+const sessions = new Map();
+
+// Generate a simple token (in production, use JWT or similar)
+function generateToken() {
+  return Math.random().toString(36).substr(2) + Date.now().toString(36);
+}
+
+// Authentication endpoints
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
+  }
+
+  if (email !== DEMO_USER.email || password !== DEMO_USER.password) {
+    return res.status(401).json({ error: 'Invalid email or password' });
+  }
+
+  const token = generateToken();
+  sessions.set(token, { email, createdAt: Date.now() });
+
+  res.json({ email, token });
+});
+
+app.get('/api/auth/verify', (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token || !sessions.has(token)) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+  res.json({ valid: true });
+});
 
 const YAHOO_HEADERS = { 'User-Agent': 'Mozilla/5.0 (compatible; GoldPriceApp/1.0)' };
 const GOLD_API_BASE = 'https://api.gold-api.com/price';
