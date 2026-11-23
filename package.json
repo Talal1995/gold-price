@@ -1,0 +1,21 @@
+{
+  "name": "gold-project",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Live gold price tracker: Express backend + React (Vite) frontend with a historical price chart.",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "install:all": "npm install --prefix server && npm install --prefix client",
+    "dev": "concurrently -n server,client -c blue,green \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "build": "npm install --prefix client && npm run build --prefix client && npm install --prefix server --omit=dev",
+    "build:client": "npm run build --prefix client",
+    "start": "npm start --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
