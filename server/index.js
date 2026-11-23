@@ -197,7 +197,7 @@ app.get('/api/crypto/list', async (_req, res) => {
     res.json(await getCryptoWatchlist());
   } catch (err) {
     console.error('Failed to fetch crypto watchlist:', err.message);
-    res.status(502).json({ error: 'Failed to fetch crypto watchlist' });
+    res.status(err.status || 502).json({ error: `Failed to fetch crypto watchlist: ${err.message}` });
   }
 });
 
