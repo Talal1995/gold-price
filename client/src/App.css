@@ -1,7 +1,19 @@
 .app {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 20px 48px;
+  padding: 20px 15px 40px;
+}
+
+@media (min-width: 480px) {
+  .app {
+    padding: 25px 18px 45px;
+  }
+}
+
+@media (min-width: 768px) {
+  .app {
+    padding: 32px 20px 48px;
+  }
 }
 
 .app__loading {
@@ -14,21 +26,51 @@
 }
 
 .app__header {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 480px) {
+  .app__header {
+    margin-bottom: 22px;
+  }
+}
+
+@media (min-width: 768px) {
+  .app__header {
+    margin-bottom: 24px;
+  }
 }
 
 .header-content {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 20px;
+  gap: 15px;
   flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+  .header-content {
+    gap: 20px;
+  }
 }
 
 .app__header h1 {
   margin: 0 0 4px;
-  font-size: 2rem;
+  font-size: 1.5rem;
   letter-spacing: -0.02em;
+}
+
+@media (min-width: 480px) {
+  .app__header h1 {
+    font-size: 1.75rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .app__header h1 {
+    font-size: 2rem;
+  }
 }
 
 .app__subtitle {
@@ -213,8 +255,23 @@
 .tabs {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 24px;
+  gap: 6px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 480px) {
+  .tabs {
+    gap: 7px;
+    margin-bottom: 22px;
+  }
+}
+
+@media (min-width: 768px) {
+  .tabs {
+    gap: 8px;
+    margin-bottom: 24px;
+  }
 }
 
 .tab-button {
@@ -222,10 +279,25 @@
   border: 1px solid var(--border);
   color: var(--text-muted);
   border-radius: 10px;
-  padding: 10px 24px;
-  font-size: 1rem;
+  padding: 8px 18px;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+@media (min-width: 480px) {
+  .tab-button {
+    padding: 9px 20px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .tab-button {
+    padding: 10px 24px;
+    font-size: 1rem;
+  }
 }
 
 .tab-button:hover {
