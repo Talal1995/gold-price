@@ -1,7 +1,7 @@
 import express from 'express';
 import fetch from 'node-fetch';
 
-const SYSTEM_PROMPT = `You are a market education assistant. Discuss only the selected asset and relevant general market factors. Use the supplied quote as the only current market data; do not claim access to news, historical trends, or other live data. Describe plausible bullish, bearish, and neutral scenarios and their uncertainty. Do not invent price targets, probabilities, news, or facts. Do not provide personalized financial advice. Explain that scenarios are not validated forecasts and prices can move unpredictably. Keep answers concise.`;
+const SYSTEM_PROMPT = `You are a helpful general-purpose assistant. Answer the user's actual question directly and naturally, including greetings and questions unrelated to markets. Use the supplied quote, if any, as the only current market data; do not claim access to current news, historical prices, or other live data. For questions about future prices, do not refuse solely because the future is uncertain: offer illustrative numerical scenarios when useful, explain the assumptions and calculations, and clearly state that they are hypothetical, not validated forecasts. Do not invent analyst forecasts, probabilities, sources, or facts. Do not present personalized investment advice as certain. Keep answers concise and adapt the level of detail to the question.`;
 const WINDOW_MS = 60_000;
 const MAX_REQUESTS_PER_WINDOW = 20;
 
@@ -16,15 +16,16 @@ export function createChatRouter({ getQuote, apiKey = process.env.GROQ_API_KEY, 
     }
 
     const { assetType, assetId, messages } = req.body || {};
-    if (!['market', 'crypto'].includes(assetType) ||
-        typeof assetId !== 'string' || !/^[a-z0-9-]{1,80}$/.test(assetId) ||
+    if (!['general', 'market', 'crypto'].includes(assetType) ||
+        typeof assetId !== 'string' ||
+        (assetType === 'general' ? assetId !== '' : !/^[a-z0-9-]{1,80}$/.test(assetId)) ||
         !Array.isArray(messages) || messages.length < 1 || messages.length > 6 ||
         messages.some((message) =>
           !message || !['user', 'assistant'].includes(message.role) ||
           typeof message.content !== 'string' || !message.content.trim() ||
           message.content.length > (message.role === 'user' ? 500 : 3000)
         ) || messages[messages.length - 1].role !== 'user') {
-      return res.status(400).json({ error: 'Please select an asset and enter a valid question.' });
+      return res.status(400).json({ error: 'Please select a valid topic and enter a valid question.' });
     }
 
     const now = Date.now();
@@ -38,19 +39,23 @@ export function createChatRouter({ getQuote, apiKey = process.env.GROQ_API_KEY, 
     requests += 1;
 
     try {
-      const quote = await getQuote(assetType, assetId);
-      if (!quote || !Number.isFinite(quote.price) || quote.price <= 0) {
-        return res.status(502).json({ error: 'A current quote is unavailable for this asset.' });
+      let marketContext = null;
+      if (assetType !== 'general') {
+        const quote = await getQuote(assetType, assetId);
+        if (!quote || !Number.isFinite(quote.price) || quote.price <= 0) {
+          return res.status(502).json({ error: 'A current quote is unavailable for this asset.' });
+        }
+
+        marketContext = {
+          asset: quote.label,
+          symbol: quote.symbolLabel,
+          price: quote.price,
+          currency: quote.currency,
+          updatedAt: quote.updatedAt || 'unknown',
+          source: assetType === 'crypto' ? 'CoinGecko' : quote.type === 'metal' ? 'gold-api.com spot' : 'Yahoo Finance',
+        };
       }
 
-      const marketContext = {
-        asset: quote.label,
-        symbol: quote.symbolLabel,
-        price: quote.price,
-        currency: quote.currency,
-        updatedAt: quote.updatedAt || 'unknown',
-        source: assetType === 'crypto' ? 'CoinGecko' : quote.type === 'metal' ? 'gold-api.com spot' : 'Yahoo Finance',
-      };
       const response = await request('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
@@ -60,7 +65,7 @@ export function createChatRouter({ getQuote, apiKey = process.env.GROQ_API_KEY, 
           reasoning_format: 'hidden',
           messages: [
             { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'system', content: `Current market quote (not a forecast): ${JSON.stringify(marketContext)}` },
+            ...(marketContext ? [{ role: 'system', content: `Selected asset quote (not a forecast): ${JSON.stringify(marketContext)}` }] : []),
             ...messages,
           ],
           max_completion_tokens: 1024,

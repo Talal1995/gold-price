@@ -10,9 +10,11 @@ client code and authentication uses an in-memory session. Do not use this setup 
 
 ## Market assistant
 
-The public market assistant discusses possible scenarios for the selected metal, stock from the
-app's watchlist, or CoinGecko coin. It receives the latest available quote and its timestamp, not
-news or historical trends. Its responses are not validated price forecasts or financial advice.
+The public assistant answers general questions and discusses possible scenarios for a selected
+metal, stock from the app's watchlist, or CoinGecko coin. Select "General questions" to chat
+without a market quote. For a selected asset it receives the latest available quote and its
+timestamp, not news or historical trends. Numerical scenarios are hypothetical, not validated
+price forecasts or financial advice.
 Questions and recent chat messages are sent to Groq; do not enter personal or financial information.
 
 Create a free API key at [Groq Console](https://console.groq.com/keys), then set `GROQ_API_KEY`

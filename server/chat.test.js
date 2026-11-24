@@ -62,7 +62,30 @@ test('grounds the model in the selected quote and returns its source', async () 
     assert.deepEqual(data.quote, { asset: 'Gold', symbol: 'XAU/USD', price: 2500, currency: 'USD', updatedAt: quote.updatedAt, source: 'gold-api.com spot' });
     assert.match(upstream.messages[1].content, /2500/);
     assert.deepEqual(upstream.messages[2], question.messages[0]);
+    assert.match(upstream.messages[0].content, /illustrative numerical scenarios/);
+    assert.match(upstream.messages[0].content, /hypothetical, not validated forecasts/);
     assert.equal(upstream.reasoning_format, 'hidden');
+  });
+});
+
+test('allows general questions without looking up an asset', async () => {
+  let upstream;
+  await withServer({
+    apiKey: 'test-key',
+    getQuote: () => { throw new Error('unexpected quote lookup'); },
+    request: async (_url, options) => {
+      upstream = JSON.parse(options.body);
+      return { ok: true, json: async () => ({ choices: [{ message: { content: 'I am doing well.' } }] }) };
+    },
+  }, async (post) => {
+    const message = { role: 'user', content: 'How are you?' };
+    const response = await post({ assetType: 'general', assetId: '', messages: [message] });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { answer: 'I am doing well.', quote: null });
+    assert.equal(upstream.messages.length, 2);
+    assert.deepEqual(upstream.messages[1], message);
+    assert.match(upstream.messages[0].content, /questions unrelated to markets/);
+    assert.equal((await post({ ...question, assetType: 'general' })).status, 400);
   });
 });
 

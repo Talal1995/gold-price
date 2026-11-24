@@ -17,7 +17,7 @@ export default function MarketChat() {
   const [quote, setQuote] = useState(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || assetType === 'general') return;
     let cancelled = false;
     const fetchList = assetType === 'crypto' ? fetchCryptoList : fetchInstruments;
     fetchList().then((items) => {
@@ -43,7 +43,7 @@ export default function MarketChat() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const text = question.trim();
-    if (!text || loading || !assetId) return;
+    if (!text || loading || (assetType !== 'general' && !assetId)) return;
     const nextMessages = [...messages, { role: 'user', content: text }]
       .slice(-6)
       .map((message) => message.role === 'assistant' ? { ...message, content: message.content.slice(0, 3000) } : message);
@@ -74,22 +74,25 @@ export default function MarketChat() {
       {open && (
         <div className="market-chat__panel">
           <h2>Market assistant</h2>
-          <p>Explore possible scenarios, not validated forecasts or financial advice. Questions are sent to Groq; do not include personal or financial information.</p>
+          <p>Ask any question or explore market scenarios. Price estimates are hypothetical, not validated forecasts or financial advice. Questions are sent to Groq; do not include personal or financial information.</p>
           <div className="market-chat__selectors">
             <label>
               Asset type
               <select value={assetType} disabled={loading} onChange={(e) => changeAsset(e.target.value, e.target.value === 'market' ? 'gold' : '')}>
+                <option value="general">General questions</option>
                 <option value="market">Metals and stocks</option>
                 <option value="crypto">Crypto</option>
               </select>
             </label>
-            <label>
-              Asset
-              <select value={assetId} disabled={loading || !assets.length} onChange={(e) => changeAsset(assetType, e.target.value)}>
-                <option value="">Select an asset</option>
-                {assets.map((asset) => <option key={asset.id} value={asset.id}>{asset.label} ({asset.symbolLabel})</option>)}
-              </select>
-            </label>
+            {assetType !== 'general' && (
+              <label>
+                Asset
+                <select value={assetId} disabled={loading || !assets.length} onChange={(e) => changeAsset(assetType, e.target.value)}>
+                  <option value="">Select an asset</option>
+                  {assets.map((asset) => <option key={asset.id} value={asset.id}>{asset.label} ({asset.symbolLabel})</option>)}
+                </select>
+              </label>
+            )}
           </div>
           {listError && <p className="market-chat__error" role="alert">{listError}</p>}
           {quote && <p className="market-chat__quote">Quote: {quote.asset} {formatCurrency(quote.price, quote.currency)} · {quote.source} · {quote.updatedAt === 'unknown' ? 'time unavailable' : new Date(quote.updatedAt).toLocaleString()}</p>}
@@ -107,7 +110,7 @@ export default function MarketChat() {
           <form onSubmit={handleSubmit}>
             <label htmlFor="market-question">Your question</label>
             <textarea id="market-question" value={question} onChange={(e) => setQuestion(e.target.value)} maxLength={500} placeholder="What scenarios could affect the price next month?" disabled={loading} required />
-            <button type="submit" disabled={loading || !assetId || !!listError}>{loading ? 'Thinking…' : 'Ask'}</button>
+            <button type="submit" disabled={loading || (assetType !== 'general' && (!assetId || !!listError))}>{loading ? 'Thinking…' : 'Ask'}</button>
           </form>
         </div>
       )}
