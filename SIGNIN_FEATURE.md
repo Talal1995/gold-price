@@ -69,7 +69,8 @@
 - Added user state management (email, token)
 - Session persistence check on component mount
 - Logout functionality with session cleanup
-- Conditional rendering (Login vs Dashboard)
+- Public market tabs with a Log in button leading to the sign-in form
+- Portfolio tab shown after sign-in; logging out returns to the public markets
 - Added "My Portfolio" as the first tab for logged-in users
 - User email and logout button in header
 
@@ -106,7 +107,7 @@ npm run dev
 
 ### Testing the Feature
 1. Open `http://localhost:5173` in your browser
-2. You'll see the Login page
+2. Browse Metals, Stocks, and Crypto, or click "Log in"
 3. Enter:
    - Email: `talal@gmail.com`
    - Password: `m12341234`

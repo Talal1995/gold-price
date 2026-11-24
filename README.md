@@ -1,7 +1,12 @@
 # Markets Tracker
 
-A full-stack app with three tabs — **Metals**, **Stocks**, and **Crypto** — each showing live
+A full-stack app with public **Metals**, **Stocks**, and **Crypto** tabs, each showing live
 prices and a historical chart with switchable time ranges (1H, 1D, 1W, 1M, 6M, 1Y, 5Y).
+Use **Log in** to open the sign-in form and access **My Portfolio** alongside the market tabs.
+Logging out returns to the public markets.
+
+The portfolio and sign-in are a demo, not a privacy boundary: holdings are included in the
+client code and authentication uses an in-memory session. Do not use this setup for private data.
 
 ## Stack
 

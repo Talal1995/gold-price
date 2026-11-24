@@ -23,8 +23,9 @@ const PAGES = {
 
 function App() {
   const [user, setUser] = useState(null);
-  const [activeTab, setActiveTab] = useState('portfolio');
+  const [activeTab, setActiveTab] = useState('metals');
   const [loading, setLoading] = useState(true);
+  const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
     // Check for existing session on mount
@@ -36,6 +37,7 @@ function App() {
         try {
           const session = JSON.parse(localSession);
           setUser({ email: session.email, token: session.token });
+          setActiveTab('portfolio');
         } catch (e) {
           console.error('Failed to parse session:', e);
         }
@@ -43,6 +45,7 @@ function App() {
         try {
           const session = JSON.parse(sessionSession);
           setUser({ email: session.email, token: session.token });
+          setActiveTab('portfolio');
         } catch (e) {
           console.error('Failed to parse session:', e);
         }
@@ -56,6 +59,7 @@ function App() {
   const handleLogin = (email, token) => {
     setUser({ email, token });
     setActiveTab('portfolio');
+    setShowLogin(false);
   };
 
   const handleLogout = () => {
@@ -69,8 +73,8 @@ function App() {
     return <div className="app__loading">Loading...</div>;
   }
 
-  if (!user) {
-    return <Login onLogin={handleLogin} />;
+  if (!user && showLogin) {
+    return <Login onLogin={handleLogin} onBack={() => setShowLogin(false)} />;
   }
 
   const ActivePage = PAGES[activeTab];
@@ -84,13 +88,19 @@ function App() {
             <p className="app__subtitle">Live prices &amp; historical charts</p>
           </div>
           <div className="header-user">
-            <span className="user-email">{user.email}</span>
-            <button onClick={handleLogout} className="logout-btn">Logout</button>
+            {user ? (
+              <>
+                <span className="user-email">{user.email}</span>
+                <button onClick={handleLogout} className="logout-btn">Logout</button>
+              </>
+            ) : (
+              <button onClick={() => setShowLogin(true)} className="logout-btn">Log in</button>
+            )}
           </div>
         </div>
       </header>
 
-      <Tabs tabs={TABS} active={activeTab} onSelect={setActiveTab} />
+      <Tabs tabs={user ? TABS : TABS.filter((tab) => tab.key !== 'portfolio')} active={activeTab} onSelect={setActiveTab} />
 
       <ActivePage />
 

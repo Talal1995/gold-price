@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import '../styles/Login.css';
 
-export default function Login({ onLogin }) {
+export default function Login({ onLogin, onBack }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -98,7 +98,9 @@ export default function Login({ onLogin }) {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-
+        <button type="button" className="login-back" onClick={onBack} disabled={loading}>
+          Back to markets
+        </button>
       </div>
     </div>
   );
