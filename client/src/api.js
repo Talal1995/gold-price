@@ -27,6 +27,10 @@ export function fetchLivePrice(id) {
   return getJson(`/api/price/live?id=${encodeURIComponent(id)}`);
 }
 
+export function fetchMetalChange(id) {
+  return getJson(`/api/price/metal-change?id=${encodeURIComponent(id)}`);
+}
+
 export function fetchLivePriceBatch(ids) {
   return getJson(`/api/price/live-batch?ids=${encodeURIComponent(ids.join(','))}`);
 }

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import { existsSync } from 'fs';
 import { ALL_INSTRUMENTS, findInstrument } from './instruments.js';
 import { getCryptoWatchlist, getCryptoLive, getCryptoHistory } from './crypto.js';
+import { withCache } from './cache.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -129,6 +130,30 @@ app.get('/api/price/live', async (req, res) => {
   } catch (err) {
     console.error(`Failed to fetch live price for ${instrument.id}:`, err.message);
     res.status(502).json({ error: `Failed to fetch live price for ${instrument.label}` });
+  }
+});
+
+app.get('/api/price/metal-change', async (req, res) => {
+  const instrument = findInstrument(req.query.id);
+  if (!instrument || instrument.type !== 'metal') {
+    return res.status(400).json({ error: 'Provide a valid metal id' });
+  }
+
+  try {
+    const quote = await withCache(`metal-change:${instrument.id}`, 30000, () =>
+      getYahooLivePrice(instrument)
+    );
+    if (!Number.isFinite(quote.price) || !Number.isFinite(quote.previousClose) || quote.previousClose <= 0) {
+      throw new Error('Futures quote or previous close is unavailable');
+    }
+    res.json({
+      change: quote.price - quote.previousClose,
+      changePercent: quote.changePercent,
+      currency: quote.currency,
+    });
+  } catch (err) {
+    console.error(`Failed to fetch futures change for ${instrument.id}:`, err.message);
+    res.status(502).json({ error: `Failed to fetch futures change for ${instrument.label}` });
   }
 });
 

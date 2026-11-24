@@ -1,6 +1,6 @@
 import { formatCurrency } from '../utils/format';
 
-export default function PriceTicker({ data, previousPrice, loading, error }) {
+export default function PriceTicker({ data, previousPrice, loading, error, metalChange, metalChangeError, showMetalChange }) {
   if (error) {
     return (
       <div className="price-ticker price-ticker--error">
@@ -48,6 +48,22 @@ export default function PriceTicker({ data, previousPrice, loading, error }) {
       {typeof data.changePercent === 'number' && (
         <div className={`price-ticker__change price-ticker__change--${changeDirection}`}>
           {data.changePercent > 0 ? '▲' : '▼'} {Math.abs(data.changePercent).toFixed(2)}% today
+        </div>
+      )}
+      {showMetalChange && (
+        <div className={`price-ticker__change${metalChange ? ` price-ticker__change--${metalChange.change > 0 ? 'up' : metalChange.change < 0 ? 'down' : 'flat'}` : ''}`}>
+          {metalChangeError ? (
+            <>Futures change unavailable: {metalChangeError}</>
+          ) : metalChange ? (
+            <>
+              {metalChange.change > 0 ? '+' : metalChange.change < 0 ? '−' : ''}
+              {formatCurrency(Math.abs(metalChange.change), metalChange.currency)}
+              {' '}({metalChange.changePercent > 0 ? '+' : metalChange.changePercent < 0 ? '−' : ''}{Math.abs(metalChange.changePercent).toFixed(2)}%)
+              {' '}futures vs previous close
+            </>
+          ) : (
+            <>Loading futures change…</>
+          )}
         </div>
       )}
       {updated && (

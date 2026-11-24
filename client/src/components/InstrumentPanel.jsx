@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { fetchLivePrice, fetchPriceHistory } from '../api';
+import { fetchLivePrice, fetchMetalChange, fetchPriceHistory } from '../api';
 import PriceTicker from './PriceTicker';
 import RangeSelector from './RangeSelector';
 import PriceChart from './PriceChart';
@@ -15,6 +15,7 @@ export default function InstrumentPanel({
   instrumentId,
   title,
   defaultRange = '1d',
+  showMetalChange = false,
   fetchLiveFn = fetchLivePrice,
   fetchHistoryFn = fetchPriceHistory,
 }) {
@@ -25,6 +26,8 @@ export default function InstrumentPanel({
   const [liveLoading, setLiveLoading] = useState(true);
   const [liveError, setLiveError] = useState(null);
   const liveDataRef = useRef(null);
+  const [metalChange, setMetalChange] = useState(null);
+  const [metalChangeError, setMetalChangeError] = useState(null);
 
   const [history, setHistory] = useState({ points: [], currency: 'USD' });
   const [historyLoading, setHistoryLoading] = useState(true);
@@ -58,6 +61,33 @@ export default function InstrumentPanel({
   }, [loadLivePrice]);
 
   useEffect(() => {
+    if (!showMetalChange) return undefined;
+    let cancelled = false;
+    setMetalChange(null);
+    setMetalChangeError(null);
+    const loadChange = async () => {
+      try {
+        const data = await fetchMetalChange(instrumentId);
+        if (!cancelled) {
+          setMetalChange(data);
+          setMetalChangeError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setMetalChange(null);
+          setMetalChangeError(err.message);
+        }
+      }
+    };
+    loadChange();
+    const id = setInterval(loadChange, 30000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [instrumentId, showMetalChange]);
+
+  useEffect(() => {
     let cancelled = false;
     setHistoryLoading(true);
     setHistoryError(null);
@@ -88,6 +118,9 @@ export default function InstrumentPanel({
         previousPrice={previousPrice}
         loading={liveLoading}
         error={liveError}
+        metalChange={metalChange}
+        metalChangeError={metalChangeError}
+        showMetalChange={showMetalChange}
       />
       <RangeSelector selected={range} onSelect={setRange} disabled={historyLoading} />
       <PriceChart

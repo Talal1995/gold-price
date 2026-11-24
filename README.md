@@ -25,7 +25,9 @@ CoinGecko's rate limit. No paid API keys or secrets are required anywhere.
 
 ## Tabs
 
-- **Metals** — Gold and Silver charts side by side, each with its own range selector.
+- **Metals** — Gold and Silver charts side by side, each with its own range selector. Each
+  spot quote also shows the corresponding futures price change in dollars per troy ounce and
+  percent versus the previous trading close (Yahoo Finance); this is not a spot-price change.
 - **Stocks** — A watchlist (NASDAQ Composite, NVIDIA, Apple, Tesla, Amazon, plus a curated static
   snapshot of ~20 large US-listed companies by market cap) with a chart for whichever row you click.
   *Note: this list is a fixed snapshot, not a live market-cap ranking — see `server/instruments.js`.
@@ -140,6 +142,7 @@ IP:
 |-----------------------------------------|------------------------------------------------------------------------|
 | `GET /api/instruments`                  | Metals + stocks catalog (id, label, symbol, type).                    |
 | `GET /api/price/live?id=gold`           | Live price for a metal/stock/index id.                                |
+| `GET /api/price/metal-change?id=gold`   | Metal futures change versus the previous trading close.              |
 | `GET /api/price/live-batch?ids=a,b,c`   | Live prices for several metal/stock/index ids in one call.            |
 | `GET /api/price/history?id=gold&range=1d` | Historical price points. `range`: `1h,1d,1w,1m,6m,1y,5y`.            |
 | `GET /api/crypto/list`                  | Top 20 coins by market cap + Cookie/Trump/WLFI, with live quotes.      |
