@@ -8,6 +8,21 @@ Logging out returns to the public markets.
 The portfolio and sign-in are a demo, not a privacy boundary: holdings are included in the
 client code and authentication uses an in-memory session. Do not use this setup for private data.
 
+## Market assistant
+
+The public market assistant discusses possible scenarios for the selected metal, stock from the
+app's watchlist, or CoinGecko coin. It receives the latest available quote and its timestamp, not
+news or historical trends. Its responses are not validated price forecasts or financial advice.
+Questions and recent chat messages are sent to Groq; do not enter personal or financial information.
+
+Create a free API key at [Groq Console](https://console.groq.com/keys), then set `GROQ_API_KEY`
+in the server environment before starting the server. On Render, add it as a secret environment
+variable in the service dashboard and redeploy. Never put the key in client code or commit it.
+The [free plan](https://console.groq.com/docs/rate-limits) has shared quotas and may change; a
+public assistant can exhaust them. The app also limits chat requests per server instance, but this
+is not a substitute for production abuse protection. Without a key, the assistant reports that
+it is not configured.
+
 ## Stack
 
 - **`server/`** — Node.js + Express API that proxies free public APIs:

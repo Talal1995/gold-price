@@ -50,3 +50,15 @@ export function fetchCryptoLive(id) {
 export function fetchCryptoHistory(id, range) {
   return getJson(`/api/crypto/history?id=${encodeURIComponent(id)}&range=${encodeURIComponent(range)}`);
 }
+
+export function askMarketAssistant(assetType, assetId, messages) {
+  return fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ assetType, assetId, messages }),
+  }).then(async (response) => {
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || `Request failed with ${response.status}`);
+    return data;
+  });
+}

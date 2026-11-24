@@ -7,6 +7,7 @@ import { existsSync } from 'fs';
 import { ALL_INSTRUMENTS, findInstrument } from './instruments.js';
 import { getCryptoWatchlist, getCryptoLive, getCryptoHistory } from './crypto.js';
 import { withCache } from './cache.js';
+import { createChatRouter } from './chat.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -118,6 +119,15 @@ async function fetchLivePrice(instrument) {
     ...result,
   };
 }
+
+app.use(createChatRouter({
+  getQuote: async (assetType, assetId) => {
+    if (assetType === 'crypto') return getCryptoLive(assetId);
+    const instrument = findInstrument(assetId);
+    if (!instrument) throw new Error('Unknown instrument');
+    return { ...await fetchLivePrice(instrument), type: instrument.type };
+  },
+}));
 
 app.get('/api/price/live', async (req, res) => {
   const instrument = findInstrument(req.query.id);

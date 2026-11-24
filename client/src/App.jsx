@@ -6,6 +6,7 @@ import Portfolio from './components/Portfolio';
 import MetalsPage from './pages/MetalsPage';
 import StocksPage from './pages/StocksPage';
 import CryptoPage from './pages/CryptoPage';
+import MarketChat from './components/MarketChat';
 
 const TABS = [
   { key: 'portfolio', label: 'My Portfolio' },
@@ -103,6 +104,8 @@ function App() {
       <Tabs tabs={user ? TABS : TABS.filter((tab) => tab.key !== 'portfolio')} active={activeTab} onSelect={setActiveTab} />
 
       <ActivePage />
+
+      <MarketChat />
 
       <footer className="app__footer">
         Precious metals: live spot price via{' '}

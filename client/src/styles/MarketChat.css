@@ -1,0 +1,99 @@
+.market-chat {
+  margin-top: 24px;
+}
+
+.market-chat__toggle,
+.market-chat form button {
+  background: var(--accent);
+  border: 0;
+  border-radius: 8px;
+  color: #111;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  padding: 10px 16px;
+}
+
+.market-chat__panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-top: 12px;
+  padding: 20px;
+}
+
+.market-chat__panel h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.market-chat__panel > p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.market-chat__selectors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.market-chat label {
+  display: flex;
+  flex: 1 1 180px;
+  flex-direction: column;
+  font-size: 0.9rem;
+  gap: 5px;
+}
+
+.market-chat select,
+.market-chat textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font: inherit;
+  padding: 10px;
+  width: 100%;
+}
+
+.market-chat__messages {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.market-chat__message {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.market-chat__message--user {
+  border-left: 3px solid var(--accent);
+}
+
+.market-chat__message p {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.market-chat__panel .market-chat__error {
+  color: #ff8a80;
+}
+
+.market-chat form textarea {
+  display: block;
+  margin: 5px 0 10px;
+  min-height: 80px;
+  resize: vertical;
+}
+
+.market-chat button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
