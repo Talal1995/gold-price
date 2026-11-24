@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { askMarketAssistant, fetchCryptoList, fetchInstruments } from '../api';
 import { formatCurrency } from '../utils/format';
 import '../styles/MarketChat.css';
@@ -101,7 +103,13 @@ export default function MarketChat() {
               {messages.map((message, index) => (
                 <div key={index} className={`market-chat__message market-chat__message--${message.role}`}>
                   <strong>{message.role === 'user' ? 'You' : 'Assistant'}</strong>
-                  <p>{message.content}</p>
+                  {message.role === 'assistant' ? (
+                    <div className="market-chat__markdown">
+                      <Markdown remarkPlugins={[remarkGfm]}>{message.content}</Markdown>
+                    </div>
+                  ) : (
+                    <p>{message.content}</p>
+                  )}
                 </div>
               ))}
             </div>
